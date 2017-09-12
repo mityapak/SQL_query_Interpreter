@@ -1,49 +1,64 @@
 import {MongoClient} from 'mongodb';
 
 export default class Interpreter {
-    constructor (parsedQuery){
+    constructor(parsedQuery) {
         this.parsedQuery = parsedQuery;
         this.objectParams = {};
 
     }
 
-    sendQuery (){
-        MongoClient.connect("mongodb://localhost:27017/test", async (err, db) => {
-            if(err)console.log(err);
+
+    async connectMongodb(){
+        try {
+            this.db = await MongoClient.connect("mongodb://localhost:27017/test");
+            let arrayOfResult = [];
 
             let queryList = this.getQueryList();
 
-            for (let i = 0; i < queryList.length; i++){
+            for (let i = 0; i < queryList.length; i++) {
                 this.objectQuery = queryList[i];
-                let collectionName = this.getCollectionName();
-                let command = this.getCommand();
-                let queryParams = this.getQueryParams();
-                let fieldsList = this.getfieldsList();
 
-                let collection = await db.collection(collectionName);
-                let data = await collection[command](queryParams, fieldsList)
+                let data = await this.sendQuery();
                 let result = await data.toArray();
-                console.log(result)
-            }
 
-        });
+                arrayOfResult.push(result)
+            }
+            await  this.db.close();
+            return arrayOfResult;
+        }
+        catch (error){
+            console.log(error)
+        }
     }
 
-    getQueryList(){
-        if (this.parsedQuery.query.constructor === Array){
+    async sendQuery() {
+
+        let collectionName = this.getCollectionName();
+        let command = this.getCommand();
+        let queryParams = this.getQueryParams();
+        let fieldsList = this.getfieldsList();
+
+        let collection = await this.db.collection(collectionName);
+        let data = await collection[command](queryParams, fieldsList);
+
+        return data;
+    }
+
+    getQueryList() {
+        if (this.parsedQuery.query.constructor === Array) {
             return this.parsedQuery.query
-        }else{
+        } else {
             return err;
         }
     }
 
-    getCollectionName(){
-            return this.objectQuery.from.name;
+    getCollectionName() {
+        return this.objectQuery.from.name;
     }
 
-    getCommand (){
+    getCommand() {
         let command = this.objectQuery.text;
-        switch (command){
+        switch (command) {
             case "select":
                 return "find";
             default:
@@ -52,35 +67,37 @@ export default class Interpreter {
     }
 
 
-    getfieldsList(){
+    getfieldsList() {
 
-       if(this.objectQuery.select.items && this.objectQuery.select.items.constructor === Array){
+        if (this.objectQuery.select.items && this.objectQuery.select.items.constructor === Array) {
 
-          let fieldList = this.objectQuery.select.items;
-          let fields = {};
-          for (let i = 0; i < fieldList.length; i++){
-              fields[fieldList[i].text] = 1;
-          }
-          return fields;
-       }
+            let fieldList = this.objectQuery.select.items;
+            let fields = {};
+            for (let i = 0; i < fieldList.length; i++) {
+                fields[fieldList[i].text] = 1;
+            }
+            return fields;
+        }
 
-       if (this.objectQuery.select.type === 'specialSymbol' && this.objectQuery.select.text ==='*'){
-           return {};
-       }
+        if (this.objectQuery.select.type === 'specialSymbol' && this.objectQuery.select.text === '*') {
+            return {};
+        }
 
     }
 
-    getQueryParams(){
-        if(this.objectQuery.where){
+    getQueryParams() {
+        if (this.objectQuery.where) {
             let expression = this.objectQuery.where.expressions;
             this.compileObjectParam(expression);
             return this.objectParams;
         }
-        else{return {}}
+        else {
+            return {}
+        }
     }
 
-    compileObjectParam (expression){
-        switch (expression.operation){
+    compileObjectParam(expression) {
+        switch (expression.operation) {
             case "and":
                 this.getRightParams(expression);
                 this.getLeftParams(expression);
@@ -89,46 +106,45 @@ export default class Interpreter {
                 this.equalOperation(expression);
                 break;
             case ">":
-                this.noEqualOperation(expression,"$gt");
+                this.noEqualOperation(expression, "$gt");
                 break;
             case "<":
-                this.noEqualOperation(expression,"$lt");
+                this.noEqualOperation(expression, "$lt");
                 break;
             case "in":
-                this.noEqualOperation(expression,"$in");
+                this.noEqualOperation(expression, "$in");
         }
     }
 
 
-
-    getRightParams(expression){
+    getRightParams(expression) {
         let rightObject = expression.right;
         this.compileObjectParam(rightObject);
     }
 
-    getLeftParams(expression){
+    getLeftParams(expression) {
         let leftObject = expression.left;
         this.compileObjectParam(leftObject);
     }
 
-    equalOperation(expression){
+    equalOperation(expression) {
         let leftValue = expression.left.name;
         let rightValue = expression.right.value;
-        if (!this.objectParams[leftValue]){
+        if (!this.objectParams[leftValue]) {
             this.objectParams[leftValue] = rightValue;
         }
 
     }
 
-    noEqualOperation(expression, operation){
+    noEqualOperation(expression, operation) {
         let leftValue = expression.left.name;
         let rightValue = expression.right.value;
-        if (!this.objectParams[leftValue]){
+        if (!this.objectParams[leftValue]) {
             this.objectParams[leftValue] = {
                 [operation]: rightValue
             };
-        }else {
-            if (!this.objectParams[leftValue][operation]){
+        } else {
+            if (!this.objectParams[leftValue][operation]) {
                 this.objectParams[leftValue][operation] = rightValue
             }
         }

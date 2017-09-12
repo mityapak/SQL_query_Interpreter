@@ -14,28 +14,39 @@ var Interpreter = (function () {
         this.objectParams = {};
     }
 
-    Interpreter.prototype.sendQuery = function sendQuery() {
-        var _this = this;
+    Interpreter.prototype.connectMongodb = _asyncToGenerator(function* () {
+        try {
+            this.db = yield _mongodb.MongoClient.connect("mongodb://localhost:27017/test");
+            var arrayOfResult = [];
 
-        _mongodb.MongoClient.connect("mongodb://localhost:27017/test", _asyncToGenerator(function* (err, db) {
-            if (err) console.log(err);
-
-            var queryList = _this.getQueryList();
+            var queryList = this.getQueryList();
 
             for (var i = 0; i < queryList.length; i++) {
-                _this.objectQuery = queryList[i];
-                var collectionName = _this.getCollectionName();
-                var command = _this.getCommand();
-                var queryParams = _this.getQueryParams();
-                var fieldsList = _this.getfieldsList();
+                this.objectQuery = queryList[i];
 
-                var collection = yield db.collection(collectionName);
-                var data = yield collection[command](queryParams, fieldsList);
+                var data = yield this.sendQuery();
                 var result = yield data.toArray();
-                console.log(result);
+
+                arrayOfResult.push(result);
             }
-        }));
-    };
+            yield this.db.close();
+            return arrayOfResult;
+        } catch (error) {
+            console.log(error);
+        }
+    });
+    Interpreter.prototype.sendQuery = _asyncToGenerator(function* () {
+
+        var collectionName = this.getCollectionName();
+        var command = this.getCommand();
+        var queryParams = this.getQueryParams();
+        var fieldsList = this.getfieldsList();
+
+        var collection = yield this.db.collection(collectionName);
+        var data = yield collection[command](queryParams, fieldsList);
+
+        return data;
+    });
 
     Interpreter.prototype.getQueryList = function getQueryList() {
         if (this.parsedQuery.query.constructor === Array) {

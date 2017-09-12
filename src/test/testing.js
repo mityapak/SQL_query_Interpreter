@@ -14,12 +14,12 @@ class controller {
         this.parserQuery = new Parser(this.file, this.keyWords)
     }
 
-    queryMongo(){
+    async queryMongo(){
         let parsedQuery = this.parserQuery.parseQuery();
 
         this.interpretator = new Interpreter(parsedQuery);
-        let data = this.interpretator.sendQuery();
-
+        let data = await this.interpretator.connectMongodb();
+        console.log(data)
         return data
     }
 }

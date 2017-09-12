@@ -25,7 +25,7 @@ var controller = (function () {
         var parsedQuery = this.parserQuery.parseQuery();
 
         this.interpretator = new _interpreter2['default'](parsedQuery);
-        var data = this.interpretator.sendQuery();
+        var data = this.interpretator.connectMongodb();
 
         return data;
     };
