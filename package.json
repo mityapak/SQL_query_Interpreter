@@ -1,0 +1,24 @@
+{
+  "name": "interpretator",
+  "version": "1.0.0",
+  "main": "build/app.js",
+  "scripts": {
+    "build": "gulp --harmony --gulpfile gulpfile.js default"
+  },
+  "dependencies": {
+    "mongodb": "*"
+  },
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-sourcemaps": "*",
+    "gulp-util": "*",
+    "del": "*",
+    "gulp-babel": "5.3.0",
+    "babel-runtime": "5.*",
+    "babel": "5.*",
+    "source-map-support": "*"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
