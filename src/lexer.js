@@ -51,8 +51,8 @@ export default class Lexer {
     }
 
     isCharacter() {
-        return (this.symbolCode >= 97
-            && this.symbolCode <= 122);
+        return this.symbolCode >= 97
+            && this.symbolCode <= 122;
     }
 
     isNumber() {
@@ -61,8 +61,9 @@ export default class Lexer {
     }
 
     isQuote() {
-        if (this.symbolCode === 43 || this.symbolCode === 39) return true;
-        return false;
+        return this.symbolCode === 43
+            || this.symbolCode === 39;
+
     }
 
     isSpecialSign() {
@@ -91,8 +92,9 @@ export default class Lexer {
     }
 
     isOperator() {
-        if (this.symbolCode >= 60 && this.symbolCode <= 62) return true;
-        return false;
+        return this.symbolCode >= 60
+            && this.symbolCode <= 62;
+
     }
 
     isEndQuery() {

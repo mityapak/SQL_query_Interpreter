@@ -229,11 +229,11 @@ export default class Parser {
             do{
                 this.getNextToken();
 
-                if(this.currentToken.type !== 'number'){
+                if(this.currentToken.type !== 'line' && this.currentToken.type !== 'number'){
                     throw Errors.Unexpectedtoken(this.currentToken.text);
                 }
 
-                rightDeclaration.value.push(this.currentToken.text);
+                rightDeclaration .value.push(this.currentToken.text);
                 this.getNextToken();
 
                 if(this.currentToken.text === ')'){

@@ -69,8 +69,7 @@ var Lexer = (function () {
     };
 
     Lexer.prototype.isQuote = function isQuote() {
-        if (this.symbolCode === 43 || this.symbolCode === 39) return true;
-        return false;
+        return this.symbolCode === 43 || this.symbolCode === 39;
     };
 
     Lexer.prototype.isSpecialSign = function isSpecialSign() {
@@ -98,8 +97,7 @@ var Lexer = (function () {
     };
 
     Lexer.prototype.isOperator = function isOperator() {
-        if (this.symbolCode >= 60 && this.symbolCode <= 62) return true;
-        return false;
+        return this.symbolCode >= 60 && this.symbolCode <= 62;
     };
 
     Lexer.prototype.isEndQuery = function isEndQuery() {
@@ -125,7 +123,8 @@ var Lexer = (function () {
             word += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
-        };
+        }
+
         if (this.isKeyWord(word)) {
             return {
                 type: "keyword",
@@ -141,12 +140,15 @@ var Lexer = (function () {
 
     Lexer.prototype.parseNumber = function parseNumber() {
         var number = '';
+
         do {
             number += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         } while (this.isNumber());
+
         var num = parseInt(number);
+
         return {
             type: 'number',
             text: num
@@ -156,6 +158,7 @@ var Lexer = (function () {
     Lexer.prototype.parseSpecialSign = function parseSpecialSign() {
         this.cursor.symbolIndex++;
         this.getCurrentSymbol();
+
         return {
             type: 'specialSymbol',
             text: '*'
@@ -186,11 +189,11 @@ var Lexer = (function () {
         this.getCurrentSymbol();
 
         while (this.symbolCode != num) {
-
             line += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         }
+
         this.cursor.symbolIndex++;
 
         return {
@@ -212,6 +215,7 @@ var Lexer = (function () {
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         } while (this.symbolCode === 32);
+
         return this.getNextWord();
     };
 

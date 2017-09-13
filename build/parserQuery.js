@@ -31,13 +31,12 @@ var Parser = (function () {
         };
 
         this.getNextToken();
-        while (this.currentToken.text !== "EOF") {
 
+        while (this.currentToken.text !== "EOF") {
             query.query.push(this.parseQueryField());
 
             this.getNextToken();
         }
-        //console.log(util.inspect(query, { depth: 8 }))
 
         return query;
     };
@@ -74,6 +73,7 @@ var Parser = (function () {
         if (this.currentToken.type !== "keyword" && this.currentToken.text !== "from") {
             throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
         }
+
         selectQuery.from = this.parseFromExpression();
 
         this.getNextToken();
@@ -85,7 +85,9 @@ var Parser = (function () {
         if (this.currentToken.type !== "keyword" && this.currentToken.text !== "where") {
             throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
         }
+
         selectQuery.where = this.parseWhereExpression();
+
         return selectQuery;
     };
 
@@ -93,6 +95,7 @@ var Parser = (function () {
         if (this.currentToken.type === "word") {
             return this.parseFieldList();
         }
+
         if (this.currentToken.text === "*") {
             return this.parseAllFieldsExpration();
         }
@@ -117,6 +120,7 @@ var Parser = (function () {
             if (this.currentToken.type !== "word") {
                 throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
             }
+
             items.push(this.parseField());
 
             this.getNextToken();
@@ -136,6 +140,7 @@ var Parser = (function () {
 
     Parser.prototype.parseFromExpression = function parseFromExpression() {
         this.getNextToken();
+
         if (this.currentToken.type !== "word") {
             throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
         }
@@ -152,6 +157,7 @@ var Parser = (function () {
             type: "where",
             expressions: null
         };
+
         this.getNextToken();
 
         if (this.currentToken.type !== "word") {
@@ -180,16 +186,23 @@ var Parser = (function () {
                 left: null,
                 right: null
             };
+
             expressions.left = expression;
+
             expressions.operation = this.currentToken.text;
+
             this.getNextToken();
+
             if (this.currentToken.type !== "word") {
                 throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
             }
+
             expressions.right = this.parseExpression();
+
             expression = expressions;
 
             this.getNextToken();
+
             if (this.currentToken.text === "EOF" || this.currentToken.text === "endQuery") {
                 return expressions;
             }
@@ -227,7 +240,7 @@ var Parser = (function () {
             do {
                 this.getNextToken();
 
-                if (this.currentToken.type !== 'line' && this.currentToken.type !== 'number') {
+                if (this.currentToken.type !== 'number') {
                     throw _errors2['default'].Unexpectedtoken(this.currentToken.text);
                 }
 
