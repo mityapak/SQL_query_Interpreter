@@ -1,5 +1,7 @@
 var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default'];
 
+var _asyncToGenerator = require('babel-runtime/helpers/async-to-generator')['default'];
+
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
 exports.__esModule = true;
@@ -21,15 +23,14 @@ var controller = (function () {
         this.parserQuery = new _parserQuery2['default'](this.file, this.keyWords);
     }
 
-    controller.prototype.queryMongo = function queryMongo() {
+    controller.prototype.queryMongo = _asyncToGenerator(function* () {
         var parsedQuery = this.parserQuery.parseQuery();
 
         this.interpretator = new _interpreter2['default'](parsedQuery);
-        var data = this.interpretator.connectMongodb();
-
+        var data = yield this.interpretator.connectMongodb();
+        console.log(data);
         return data;
-    };
-
+    });
     return controller;
 })();
 

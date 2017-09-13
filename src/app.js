@@ -3,7 +3,6 @@ import Interpreter from './interpreter';
 
 
 
-
 export default class controller {
     constructor (text,keyWords){
         this.file = text;

@@ -11,6 +11,7 @@ export default class Interpreter {
     async connectMongodb(){
         try {
             this.db = await MongoClient.connect("mongodb://localhost:27017/test");
+
             let arrayOfResult = [];
 
             let queryList = this.getQueryList();
@@ -21,7 +22,8 @@ export default class Interpreter {
                 let data = await this.sendQuery();
                 let result = await data.toArray();
 
-                arrayOfResult.push(result)
+
+                arrayOfResult.push(result);
             }
             await  this.db.close();
             return arrayOfResult;

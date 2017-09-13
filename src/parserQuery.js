@@ -16,15 +16,14 @@ export default class Parser {
         };
 
         this.getNextToken();
-        while(this.currentToken.text !== "EOF"){
 
+        while(this.currentToken.text !== "EOF"){
             query.query.push(
                 this.parseQueryField()
             );
 
             this.getNextToken();
         }
-        //console.log(util.inspect(query, { depth: 8 }))
 
         return query;
     }
@@ -63,6 +62,7 @@ export default class Parser {
         if (this.currentToken.type !== "keyword" && this.currentToken.text !== "from") {
             throw Errors.Unexpectedtoken(this.currentToken.text);
         }
+
         selectQuery.from = this.parseFromExpression();
 
         this.getNextToken();
@@ -74,7 +74,9 @@ export default class Parser {
         if (this.currentToken.type !== "keyword" && this.currentToken.text !== "where") {
             throw Errors.Unexpectedtoken(this.currentToken.text);
         }
+
         selectQuery.where = this.parseWhereExpression();
+
         return selectQuery;
     }
 
@@ -82,6 +84,7 @@ export default class Parser {
         if (this.currentToken.type === "word") {
             return this.parseFieldList();
         }
+
         if (this.currentToken.text === "*") {
             return this.parseAllFieldsExpration();
         }
@@ -106,6 +109,7 @@ export default class Parser {
             if(this.currentToken.type !== "word"){
                 throw Errors.Unexpectedtoken(this.currentToken.text);
             }
+
             items.push(this.parseField());
 
             this.getNextToken();
@@ -113,7 +117,7 @@ export default class Parser {
         return {
             type: 'field-list',
             items
-        }
+        };
     }
 
     parseField() {
@@ -125,6 +129,7 @@ export default class Parser {
 
     parseFromExpression(){
         this.getNextToken();
+
         if(this.currentToken.type !== "word"){
             throw Errors.Unexpectedtoken(this.currentToken.text);
         }
@@ -141,6 +146,7 @@ export default class Parser {
             type: "where",
             expressions: null
         }
+
         this.getNextToken();
 
         if(this.currentToken.type !== "word"){
@@ -169,16 +175,23 @@ export default class Parser {
                 left:null,
                 right:null
             }
+
             expressions.left = expression;
+
             expressions.operation = this.currentToken.text;
+
             this.getNextToken();
+
             if(this.currentToken.type !== "word"){
                 throw Errors.Unexpectedtoken(this.currentToken.text);
             }
+
             expressions.right = this.parseExpression();
+
             expression = expressions;
 
             this.getNextToken();
+
             if (this.currentToken.text === "EOF" || this.currentToken.text === "endQuery"){
                 return expressions;
             }
@@ -216,11 +229,11 @@ export default class Parser {
             do{
                 this.getNextToken();
 
-                if(this.currentToken.type !== 'line' && this.currentToken.type !== 'number'){
+                if(this.currentToken.type !== 'number'){
                     throw Errors.Unexpectedtoken(this.currentToken.text);
                 }
 
-                rightDeclaration .value.push(this.currentToken.text);
+                rightDeclaration.value.push(this.currentToken.text);
                 this.getNextToken();
 
                 if(this.currentToken.text === ')'){

@@ -1,19 +1,17 @@
 import Cursor from './cursor'
 
-export  default class Lexer {
-    constructor (text, keyWords) {
+export default class Lexer {
+    constructor(text, keyWords) {
         this.keyWords = keyWords;
-        this.cursor = new Cursor (text)
+        this.cursor = new Cursor(text)
     }
 
-    getCurrentSymbol(){
+    getCurrentSymbol() {
         this.symbol = this.cursor.getCurrentCursor();
         this.symbolCode = this.symbol.charCodeAt(0)
     }
 
-
-
-    getNextWord () {
+    getNextWord() {
         this.getCurrentSymbol();
 
         switch (true) {
@@ -48,61 +46,62 @@ export  default class Lexer {
                 return this.endOfQuery();
 
             default:
-                throw new Error ();
+                throw new Error();
         }
     }
 
-    isCharacter (){
-        return (this.symbolCode >= 97 && this.symbolCode <= 122);
-
+    isCharacter() {
+        return (this.symbolCode >= 97
+            && this.symbolCode <= 122);
     }
 
-    isNumber (){
-        return this.symbolCode >= 48 && this.symbolCode <= 57
-
+    isNumber() {
+        return this.symbolCode >= 48
+            && this.symbolCode <= 57;
     }
 
-    isQuote (){
-        if (this.symbolCode === 43 || this.symbolCode === 39)return true;
+    isQuote() {
+        if (this.symbolCode === 43 || this.symbolCode === 39) return true;
         return false;
     }
 
-    isSpecialSign(){
+    isSpecialSign() {
         return this.symbol === "*";
     }
 
-    isWhiteSpace(){
+    isWhiteSpace() {
         return this.symbolCode === 32;
     }
 
-    isLowerHyphen(){
+    isLowerHyphen() {
         return this.symbolCode === 95;
     }
 
-    isEndString(){
+    isEndString() {
         return this.symbol === "EOF";
     }
 
-    isComma(){
+    isComma() {
         return this.symbol === ",";
     }
 
-    isParenthsis(){
-        return this.symbolCode === 40 || this.symbolCode === 41
+    isParenthsis() {
+        return this.symbolCode === 40
+            || this.symbolCode === 41
     }
 
-    isOperator(){
-        if (this.symbolCode >= 60 && this.symbolCode <= 62)return true;
+    isOperator() {
+        if (this.symbolCode >= 60 && this.symbolCode <= 62) return true;
         return false;
     }
 
-    isEndQuery(){
+    isEndQuery() {
         return this.symbolCode === 59;
     }
 
-    isKeyWord(word){
-        for (let i =0; i < this.keyWords.length; i++){
-            if (word === this.keyWords[i]){
+    isKeyWord(word) {
+        for (let i = 0; i < this.keyWords.length; i++) {
+            if (word === this.keyWords[i]) {
                 return true;
             }
         }
@@ -115,12 +114,13 @@ export  default class Lexer {
         this.cursor.symbolIndex++;
         this.getCurrentSymbol();
 
-        while (this.isCharacter() || this.isLowerHyphen()){
+        while (this.isCharacter() || this.isLowerHyphen()) {
             word += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
-        };
-        if(this.isKeyWord(word)) {
+        }
+
+        if (this.isKeyWord(word)) {
             return {
                 type: "keyword",
                 text: word
@@ -134,97 +134,101 @@ export  default class Lexer {
         }
     }
 
-    parseNumber(){
+    parseNumber() {
         let number = '';
-        do{
+
+        do {
             number += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         }
         while (this.isNumber())
+
         let num = parseInt(number)
-         return {
+
+        return {
             type: 'number',
             text: num
-        }
+        };
     }
 
-    parseSpecialSign (){
+    parseSpecialSign() {
         this.cursor.symbolIndex++;
         this.getCurrentSymbol();
+
         return {
             type: 'specialSymbol',
             text: '*'
-        }
+        };
     }
 
-    parseOperator(){
+    parseOperator() {
         this.cursor.symbolIndex++;
 
         return {
             type: "operator",
             text: this.symbol
-        }
+        };
     }
 
-    parseComma(){
+    parseComma() {
         this.cursor.symbolIndex++;
         return {
             type: 'specialSymbol',
             text: ','
-        }
+        };
     }
 
-    parseLine (){
+    parseLine() {
         let line = '';
         let num = this.symbolCode;
         this.cursor.symbolIndex++;
         this.getCurrentSymbol();
 
-        while(this.symbolCode != num){
-
+        while (this.symbolCode != num) {
             line += this.symbol;
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         }
+
         this.cursor.symbolIndex++;
 
         return {
             type: 'line',
             text: line
-        }
+        };
     }
 
-    parseParenthsis(){
+    parseParenthsis() {
         this.cursor.symbolIndex++;
-        return{
+        return {
             type: 'specialSymbol',
             text: this.symbol
         }
     }
 
-    skipWhiteSpace (){
+    skipWhiteSpace() {
         do {
             this.cursor.symbolIndex++;
             this.getCurrentSymbol();
         }
         while (this.symbolCode === 32)
-        return this.getNextWord()
 
+        return this.getNextWord();
     }
 
-    endOfQuery(){
+    endOfQuery() {
         this.cursor.symbolIndex++;
-        return{
-            type : 'end',
-            text : 'endQuery'
-        }
+        return {
+            type: 'end',
+            text: 'endQuery'
+        };
     }
 
-    endOfstring(){
+    endOfstring() {
         return {
-            type : 'end',
-            text : 'EOF'
-        }
+            type: 'end',
+            text: 'EOF'
+        };
     }
 }

@@ -17,6 +17,7 @@ var Interpreter = (function () {
     Interpreter.prototype.connectMongodb = _asyncToGenerator(function* () {
         try {
             this.db = yield _mongodb.MongoClient.connect("mongodb://localhost:27017/test");
+
             var arrayOfResult = [];
 
             var queryList = this.getQueryList();

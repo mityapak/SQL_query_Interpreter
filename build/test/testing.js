@@ -12,7 +12,7 @@ var _interpreter = require('../interpreter');
 
 var _interpreter2 = _interopRequireDefault(_interpreter);
 
-var text = "select * from users where age < 4 and name ='ccc'";
+var text = "select * from users where age < 4 ;select * from users where name = 'ccc'";
 var keyWords = ["select", "from", "where", "and"];
 
 var controller = (function () {
@@ -26,7 +26,6 @@ var controller = (function () {
 
     controller.prototype.queryMongo = _asyncToGenerator(function* () {
         var parsedQuery = this.parserQuery.parseQuery();
-
         this.interpretator = new _interpreter2['default'](parsedQuery);
         var data = yield this.interpretator.connectMongodb();
         console.log(data);
